@@ -264,7 +264,7 @@ void lerArquivo (Ponto p[], int tam, FILE* arq) {
 }
 
 int main() {
-	FILE* arq = fopen("trembala.dat", "r");
+	FILE* arq = fopen("trembala1.dat", "r");
 	
 	int tam, i;
 	fscanf(arq, "%i", &tam);
