@@ -1,90 +1,100 @@
 #include <stdio.h>
-#include <stdlib.h>
-#define tam 10
+#include <stdlib.h> 
 
-int inicio = 0, final = 0;
+typedef struct cell{
+	int info;
+	struct cell* prox;
+}List;
 
-// checa se a fila está vazia
-int filavazia() {
-	return inicio == final;
+typedef struct fila{
+	int inicio, fim, size;
+	int* fila;	
+}Fila;
+
+// fila com lista encadeada //
+List* criar_lista() {
+	List* node = (List*) malloc(sizeof(List));
+	node->prox = NULL;
+	return node;
 }
 
-// checa se a fila está cheia
-int filacheia() {
-	return (final+1)%tam == inicio;
-}
-
-// retorna o coprimento da fila (número de elementos)
-int comprimentoDaFila () {
-	int n;
-	int count = 0;
-	if(inicio > final ) {
-		for( n = inicio ; n < tam  ; n++ )
-			count++;
-		for( n = 0 ; n <= final  ; n++ )
-			count++;
-		return count;
+void insere_fila_list(int info, List* fila) {
+	if(fila->prox == NULL) {
+		fila->prox = criar_lista();
+		fila->prox->info = info;
 	}
-	for( n = inicio ; n <= final ; n++ )
-		count++;
-	return count;
+	else insere_fila_list(info, fila->prox);
 }
 
-// insere um elemento no final da fila
-void colocanafila(int* fila, int conteudo) {
-	if(!filacheia()) {
-		fila[final++] = conteudo;
-		if(final == tam) {
-			final = 0;
-		}
+int remove_fila_list(List* fila) {
+	if(!fila_vazia_list(fila)) {
+		int info = fila->prox->info;
+		fila = fila->prox->prox;
+		return info;
 	}
 }
 
-// tira um elemento do inicio da fila
-int tiradafila(int* fila) {
-	if(!filavazia()) {
-		int n = fila[inicio++];
-		if(inicio == tam) {
-			inicio = 0;
-		}
-		return n;
+int fila_vazia_list(List* fila) {
+	return fila->prox == NULL;
+} 
+
+void print_fila_list(List* le) {
+	if(le->prox != NULL) {
+		printf("%i ",le->info);
+		print_fila_list(le->prox);
 	}
+}
+
+// fila com vetor //
+
+Fila criar_fila(int size) {
+	Fila f;
+	f.inicio = f.fim = 0;
+	f.size = size;
+	f.fila = (int*) malloc(sizeof(int)*size);
+	return f;
+}
+
+int fila_vazia(Fila* f) {
+	return (*f).inicio == (*f).fim;
+}
+
+int fila_cheia(Fila* f) {
+	return (*f).fim == (*f).size;
+}
+
+void insere_fila(Fila* f, int info) {
+	if(!fila_cheia(f))  (*f).fila[ (*f).fim++ ] = info;
+}
+
+int remove_fila(Fila* f) {
+	if(!fila_vazia(f)) return (*f).fila[ (*f).inicio++ ];
+}
+
+void print_fila(Fila f) {
+	while(f.inicio < f.fim) printf("%i ",f.fila[f.inicio++]);
+}
+
+// fila circular com vetor //
+/*cria fila é a mesma da fila simples*/
+
+int fila_circular_vazia(Fila* f) {
+	return ( (*f).fim % (*f).size ) == (*f).inicio; 
+}
+
+int fila_circular_cheia(Fila* f) {
+	return ( ((*f).fim+1) % (*f).size ) == (*f).inicio;
+}
+
+void insere_fila_circular(Fila* f, int info) {
+	if(!fila_circular_cheia(f)) (*f).fila[ ((*f).fim++ % (*f).size) ] = info;
+}
+
+int remove_fila_circular(Fila* f) {
+	if(!fila_circular_vazia(f)) return (*f).fila[ ((*f).inicio++ % (*f).size) ];
 }
 
 
 int main() {
-	int n, fila[tam];
-	
-	for(n = 0; n<tam ; n++) {
-		fila[n] = -1;
-	}
-	
-	colocanafila(fila, 1);
-	colocanafila(fila, 2);
-	colocanafila(fila, 3);
-	colocanafila(fila, 4);
-	colocanafila(fila, 5);
-	colocanafila(fila, 6);
-	colocanafila(fila, 7);
-	colocanafila(fila, 8);
-	colocanafila(fila, 9);
-	colocanafila(fila, 10);
-	
-	tiradafila(fila);
-	tiradafila(fila);
-	tiradafila(fila);
-	tiradafila(fila);
-	tiradafila(fila);
-	
-	colocanafila(fila, 4);
-	colocanafila(fila, 5);
-	
-	
-	for(n = 0; n<tam ; n++) {
-		printf("[%i]",fila[n]);
-	}
-	
-	int k = comprimentoDaFila();
-	
-	printf("%i",k);
 }
+
